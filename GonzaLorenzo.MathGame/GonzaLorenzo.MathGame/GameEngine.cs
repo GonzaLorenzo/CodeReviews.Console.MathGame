@@ -4,7 +4,7 @@ namespace GonzaLorenzo.MathGame;
 
 internal class GameEngine
 {
-    Random random = new();
+    private static readonly Random random = new();
 
     int firstNumber = 0;
     int secondNumber = 0;
@@ -23,13 +23,13 @@ internal class GameEngine
         Difficulty difficulty = ChooseDifficulty();
         int scoreValue = GetScoreValue(difficulty);
         SetNumbersRange(difficulty);
-        string operation = SetOperation(gameMode);
 
+        string operation = SetOperation(gameMode);
         int questions = ChooseNumberOfQuestions();
 
-        DateTime startTime = DateTime.Now;
-
         int score = 0;
+
+        DateTime startTime = DateTime.Now;
 
         for (int i = 0; i < questions; i++)
         {
@@ -56,26 +56,11 @@ internal class GameEngine
             if (CheckResults(int.Parse(result), operation, firstNumber, secondNumber))
             {
                 score += scoreValue;
-
-                if (i == questions - 1)
-                {
-                    Console.WriteLine("Your answer was correct!");
-                    continue;
-                }
-
-                Console.WriteLine("Your answer was correct! Press enter for the next question.");
-                Console.ReadLine();
+                SendNextQuestion(true, i, questions);
             }
             else
             {
-                if (i == questions - 1)
-                {
-                    Console.WriteLine("Your answer was incorrect.");
-                    continue;
-                }
-
-                Console.WriteLine("Your answer was incorrect. Press enter key for the next question.");
-                Console.ReadLine();
+                SendNextQuestion(false, i, questions);
             }
         }
 
@@ -88,92 +73,81 @@ internal class GameEngine
 
     internal void SetGameMode(GameMode gameMode)
     {
-        GameMode selectedMode = GameMode.Addition;
-
         switch (gameMode)
         {
             case GameMode.Addition:
                 Console.Clear();
                 Console.WriteLine("Addition game selected.");
-                selectedMode = GameMode.Addition;
                 break;
 
             case GameMode.Substraction:
                 Console.Clear();
                 Console.WriteLine("Substraction game selected.");
-                selectedMode = GameMode.Substraction;
                 break;
 
             case GameMode.Multiplication:
                 Console.Clear();
                 Console.WriteLine("Multiplication game selected.");
-                selectedMode = GameMode.Multiplication;
                 break;
 
             case GameMode.Division:
                 Console.Clear();
                 Console.WriteLine("Division game selected.");
-                selectedMode = GameMode.Division;
                 break;
 
             case GameMode.Random:
                 Console.Clear();
                 Console.WriteLine("Random game selected.");
-                selectedMode = GameMode.Random;
                 break;
         }
 
-        MathGame(selectedMode);
+        MathGame(gameMode);
     }
 
     string SetOperation(GameMode gameMode)
     {
-        string operation = "";
-
-        if (gameMode != GameMode.Random)
+        switch (gameMode)
         {
-            switch (gameMode)
-            {
-                case GameMode.Addition:
-                    operation = "+";
-                    break;
+            case GameMode.Addition:
+                return "+";
 
-                case GameMode.Substraction:
-                    operation = "-";
-                    break;
+            case GameMode.Substraction:
+                return "-";
 
-                case GameMode.Multiplication:
-                    operation = "*";
-                    break;
+            case GameMode.Multiplication:
+                return "*";
 
-                case GameMode.Division:
-                    operation = "/";
-                    break;
-            }
-        }
-        else
-        {
-            switch (random.Next(1, 5))
-            {
-                case 1:
-                    operation = "+";
-                    break;
+            case GameMode.Division:
+                return "/";
 
-                case 2:
-                    operation = "-";
-                    break;
+            case GameMode.Random:
+                return SetRandomOperation();
 
-                case 3:
-                    operation = "*";
-                    break;
-
-                case 4:
-                    operation = "/";
-                    break;
-            }
+            default:
+                return "+";
         }
 
-        return operation;
+    }
+
+    string SetRandomOperation()
+    {
+        switch (random.Next(1, 5))
+        {
+            case 1:
+                return "+";
+
+            case 2:
+                return "-";
+
+            case 3:
+                return "*";
+
+            case 4:
+                return "/";
+
+            default:
+                return "+";
+        }
     }
 
     int GetScoreValue(Difficulty difficulty)
@@ -267,7 +241,7 @@ internal class GameEngine
         }
 
         Console.Clear();
-        if(numberOfQuestions == 1)
+        if (numberOfQuestions == 1)
         {
             Console.WriteLine($"{numberOfQuestions} question selected. Press enter to start the game.");
         }
@@ -275,7 +249,7 @@ internal class GameEngine
         {
             Console.WriteLine($"{numberOfQuestions} questions selected. Press enter to start the game.");
         }
-        
+
         Console.ReadLine();
 
         return numberOfQuestions;
@@ -356,6 +330,32 @@ internal class GameEngine
 
             default:
                 throw new ArgumentException("Invalid operation");
+        }
+    }
+
+    void SendNextQuestion(bool isCorrect, int i, int questions)
+    {
+        if (isCorrect)
+        {
+            if (i == questions - 1)
+            {
+                Console.WriteLine("Your answer was correct!");
+                return;
+            }
+
+            Console.WriteLine("Your answer was correct! Press enter for the next question.");
+            Console.ReadLine();
+        }
+        else
+        {
+            if (i == questions - 1)
+            {
+                Console.WriteLine("Your answer was incorrect.");
+                return;
+            }
+
+            Console.WriteLine("Your answer was incorrect. Press enter key for the next question.");
+            Console.ReadLine();
         }
     }
 }
